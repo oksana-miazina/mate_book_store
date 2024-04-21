@@ -18,7 +18,6 @@ public class CreateBookRequestDto {
     @Pattern(regexp = "^\\d{13}$", message = "The ISBN must contain exactly 13 digits")
     private String isbn;
 
-    @NotBlank(message = "Price is required")
     @DecimalMin(value = "0.01", message = "The price must be greater than 0")
     private BigDecimal price;
 
