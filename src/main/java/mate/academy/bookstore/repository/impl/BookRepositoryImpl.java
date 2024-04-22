@@ -3,6 +3,7 @@ package mate.academy.bookstore.repository.impl;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import java.util.List;
 import java.util.Optional;
@@ -60,6 +61,8 @@ public class BookRepositoryImpl implements BookRepository {
                     + "WHERE b.id = :id", Book.class);
             query.setParameter("id", id);
             return Optional.ofNullable(query.getSingleResult());
+        } catch (NoResultException e) {
+            return Optional.empty();
         } catch (Exception e) {
             throw new DataProcessingException("Can't find a book by id: " + id, e);
         }
