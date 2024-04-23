@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import lombok.Data;
 
 @Data
-public class CreateBookRequestDto {
+public class BookRequestDto {
     @NotBlank(message = "Title is required")
     private String title;
 
