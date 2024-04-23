@@ -1,9 +1,0 @@
-databaseChangeLog:
-  - changeSet:
-      id: add-column-is-deleted-books-table
-      author: omiazina
-      changes:
-        - addNotNullConstraint:
-            columnDataType: boolean
-            columnName: is_deleted
-            tableName: books
