@@ -9,6 +9,7 @@ import mate.academy.bookstore.mapper.BookMapper;
 import mate.academy.bookstore.model.Book;
 import mate.academy.bookstore.repository.BookRepository;
 import mate.academy.bookstore.service.BookService;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,6 +20,10 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BookDto save(BookRequestDto bookDto) {
+        bookRepository.findByIsbn(bookDto.getIsbn())
+                .ifPresent(s -> {
+                    throw new DataIntegrityViolationException("Book already exists.");
+                });
         Book book = bookMapper.toModel(bookDto);
         Book savedBook = bookRepository.save(book);
         return bookMapper.toDto(savedBook);

@@ -8,17 +8,23 @@ import lombok.Data;
 
 @Data
 public class BookRequestDto {
-    @NotBlank(message = "Title is required")
+    private static final String ISBN_PATTERN =
+            "^(?:ISBN(?:-1[03])?:? )?(?=[0-9X]{10}$|(?=(?:[0-9]+[- ]){3})"
+                + "[- 0-9X]{13}$|97[89][0-9]{10}$|(?=(?:[0-9]+[- ]){4})[- 0-9]{17}$)"
+                + "(?:97[89][- ]?)?[0-9]{1,5}[- ]?[0-9]+[- ]?[0-9]+[- ]?[0-9X]$";
+    private static final String PRICE_MIN = "0.01";
+
+    @NotBlank(message = "{validation.title.notempty}")
     private String title;
 
-    @NotBlank(message = "Author is required")
+    @NotBlank(message = "{validation.author.notempty}")
     private String author;
 
-    @NotBlank(message = "ISBN is required")
-    @Pattern(regexp = "^\\d{13}$", message = "The ISBN must contain exactly 13 digits")
+    @NotBlank(message = "{validation.isbn.notempty}")
+    @Pattern(regexp = ISBN_PATTERN, message = "{validation.isbn.valid}")
     private String isbn;
 
-    @DecimalMin(value = "0.01", message = "The price must be greater than 0")
+    @DecimalMin(value = PRICE_MIN, message = "{validation.price.valid}")
     private BigDecimal price;
 
     private String description;
