@@ -1,5 +1,9 @@
 package mate.academy.bookstore.controller;
 
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -21,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "Book Management", description = "Endpoints for managing books")
 @RestController
 @RequestMapping("/api/books")
 @AllArgsConstructor
@@ -28,18 +33,24 @@ public class BookController {
     private final BookService bookService;
 
     @GetMapping
+    @Operation(summary = "Get all books", description = "Get all books")
     public ResponseEntity<SuccessResponse<List<BookDto>>> getAll(Pageable pageable) {
         return ResponseHandler.getSuccessResponse(
                 bookService.findAll(pageable));
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get book by id", description = "Get book by id")
     public ResponseEntity<SuccessResponse<BookDto>> getBookById(@PathVariable Long id) {
         return ResponseHandler.getSuccessResponse(
                 bookService.getById(id));
     }
 
     @PostMapping
+    @Operation(summary = "Create a new book", description = "Create a new book")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "409", description = "Book with such ISBN already exists"),
+    })
     public ResponseEntity<SuccessResponse<BookDto>> createBook(
             @Valid @RequestBody BookRequestDto bookDto) {
         return ResponseHandler.getSuccessResponse(
@@ -48,6 +59,7 @@ public class BookController {
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Update an existing book", description = "Update an existing book")
     public ResponseEntity<SuccessResponse<BookDto>> updateBookById(@PathVariable Long id,
                                   @RequestBody BookRequestDto bookRequestDto) {
         return ResponseHandler.getSuccessResponse(
@@ -55,8 +67,9 @@ public class BookController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete book by id", description = "Delete book by id")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void updateBookById(@PathVariable Long id) {
+    public void deleteBookById(@PathVariable Long id) {
         bookService.deleteById(id);
     }
 }
