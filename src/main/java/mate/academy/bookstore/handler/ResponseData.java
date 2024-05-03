@@ -5,7 +5,7 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @Getter
-public class ResponseData {
+public abstract class ResponseData {
     private boolean success;
 
     private int status;
