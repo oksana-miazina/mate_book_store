@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ControllerAdvice
-public class BookControllerExceptionHandler {
+public class CustomGlobalExceptionHandler {
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseData handleEntityNotFoundException(EntityNotFoundException ex) {
-        return new ResponseData(
+        return new ErrorResponseData(
                 HttpStatus.NOT_FOUND,
                 null,
                 List.of(new ErrorMessage("", ex.getMessage()))
@@ -33,14 +33,14 @@ public class BookControllerExceptionHandler {
         List<ErrorMessage> errors = ex.getBindingResult().getAllErrors().stream()
                 .map(this::getErrorMessage)
                 .toList();
-        return new ResponseData(HttpStatus.BAD_REQUEST, null, errors);
+        return new ErrorResponseData(HttpStatus.BAD_REQUEST, null, errors);
     }
 
     @ExceptionHandler(PropertyReferenceException.class)
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseData handlePropertyReferenceException(PropertyReferenceException ex) {
-        return new ResponseData(
+        return new ErrorResponseData(
                 HttpStatus.BAD_REQUEST,
                 null,
                 List.of(new ErrorMessage("", ex.getMessage()))
@@ -52,7 +52,7 @@ public class BookControllerExceptionHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     public ResponseData handleDataIntegrityViolationException(
             DataIntegrityViolationException ex) {
-        return new ResponseData(
+        return new ErrorResponseData(
                 HttpStatus.CONFLICT,
                 null,
                 List.of(new ErrorMessage("", ex.getMessage()))
