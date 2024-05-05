@@ -52,8 +52,8 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public void tes() {
-
+    public int tes() {
+        return 1;
     }
 
     private Book findBookById(Long id) {
