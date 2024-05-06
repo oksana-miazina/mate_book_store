@@ -1,6 +1,8 @@
 package mate.academy.bookstore.service.impl;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import mate.academy.bookstore.dto.BookDto;
 import mate.academy.bookstore.dto.BookRequestDto;
@@ -48,11 +50,21 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public BookDto updateById(Long id, BookRequestDto bookRequestDto) {
-        getBookByIdOrThrowException(id);
-        Book book = bookMapper.toModel(bookRequestDto);
-        book.setId(id);
-        return bookMapper.toDto(bookRepository.save(book));
+    public BookDto updateById(Long id, BookRequestDto bookDto) {
+        Book book = getBookByIdOrThrowException(id);
+
+        if (!book.getIsbn().equals(bookDto.getIsbn())) {
+            Optional<Book> bookByIsbn = bookRepository.findByIsbn(bookDto.getIsbn());
+            if (bookByIsbn.isPresent() && !Objects.equals(bookByIsbn.get().getId(), book.getId())) {
+                throw new DataIntegrityViolationException(
+                        localeService.getMessage("exception.exists.book")
+                );
+            }
+        }
+
+        Book bookUpdated = bookMapper.toModel(bookDto);
+        bookUpdated.setId(id);
+        return bookMapper.toDto(bookRepository.save(bookUpdated));
     }
 
     @Override
