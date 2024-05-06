@@ -9,6 +9,7 @@ import mate.academy.bookstore.mapper.BookMapper;
 import mate.academy.bookstore.model.Book;
 import mate.academy.bookstore.repository.BookRepository;
 import mate.academy.bookstore.service.BookService;
+import mate.academy.bookstore.service.LocaleService;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
@@ -17,12 +18,15 @@ import org.springframework.stereotype.Service;
 public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final BookMapper bookMapper;
+    private final LocaleService localeService;
 
     @Override
     public BookDto save(BookRequestDto bookDto) {
         bookRepository.findByIsbn(bookDto.getIsbn())
                 .ifPresent(s -> {
-                    throw new DataIntegrityViolationException("Book already exists.");
+                    throw new DataIntegrityViolationException(
+                            localeService.getMessage("exception.exists.book")
+                    );
                 });
         Book book = bookMapper.toModel(bookDto);
         Book savedBook = bookRepository.save(book);
@@ -38,13 +42,13 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BookDto getById(Long id) {
-        Book book = findBookById(id);
+        Book book = getBookByIdOrThrowException(id);
         return bookMapper.toDto(book);
     }
 
     @Override
     public BookDto updateById(Long id, BookRequestDto bookRequestDto) {
-        findBookById(id);
+        getBookByIdOrThrowException(id);
         Book book = bookMapper.toModel(bookRequestDto);
         book.setId(id);
         return bookMapper.toDto(bookRepository.save(book));
@@ -52,12 +56,14 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public void deleteById(Long id) {
-        findBookById(id);
+        getBookByIdOrThrowException(id);
         bookRepository.deleteById(id);
     }
 
-    private Book findBookById(Long id) {
+    private Book getBookByIdOrThrowException(Long id) {
         return bookRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Can't find a book by id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        localeService.getMessage("exception.notfound.book") + id
+                ));
     }
 }
