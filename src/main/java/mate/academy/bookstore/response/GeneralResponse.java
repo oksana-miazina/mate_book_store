@@ -7,11 +7,11 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public abstract class GeneralResponse {
-    private boolean success;
-    private int status;
+    private final boolean success;
+    private final int status;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
-    private Date timestamp;
+    private final Date timestamp;
 
     public GeneralResponse(HttpStatus status) {
         this.timestamp = new Date();
