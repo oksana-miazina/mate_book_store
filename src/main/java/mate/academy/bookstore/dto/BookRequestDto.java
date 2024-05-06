@@ -1,5 +1,6 @@
 package mate.academy.bookstore.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -22,6 +23,7 @@ public class BookRequestDto {
 
     @NotBlank(message = "{validation.isbn.notempty}")
     @Pattern(regexp = ISBN_PATTERN, message = "{validation.isbn.valid}")
+    @Schema(type = "string", example = "ISBN-13: 978-0-596-52068-7")
     private String isbn;
 
     @DecimalMin(value = PRICE_MIN, message = "{validation.price.valid}")

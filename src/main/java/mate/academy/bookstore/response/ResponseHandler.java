@@ -2,31 +2,24 @@ package mate.academy.bookstore.response;
 
 import java.util.List;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 public class ResponseHandler {
-    public static ResponseEntity<ErrorResponse> getErrorResponse(
+    public static ErrorResponse getErrorResponse(
             String message, HttpStatus status) {
-        return new ResponseEntity<>(
-                new ErrorResponse(List.of(new ErrorResponse.Message(null, message)), status),
-                status);
+        return new ErrorResponse(List.of(new ErrorResponse.Message(null, message)), status);
     }
 
-    public static ResponseEntity<ErrorResponse> getErrorResponse(
+    public static ErrorResponse getErrorResponse(
             List<ErrorResponse.Message> messages, HttpStatus status) {
-        return new ResponseEntity<>(
-                new ErrorResponse(messages, status),
-                status);
+        return new ErrorResponse(messages, status);
     }
 
-    public static <T> ResponseEntity<SuccessResponse<T>> getSuccessResponse(T data) {
+    public static <T> SuccessResponse<T> getSuccessResponse(T data) {
         return getSuccessResponse(data, HttpStatus.OK);
     }
 
-    public static <T> ResponseEntity<SuccessResponse<T>> getSuccessResponse(
+    public static <T> SuccessResponse<T> getSuccessResponse(
             T data, HttpStatus status) {
-        return new ResponseEntity<>(
-                new SuccessResponse<>(data, status),
-                status);
+        return new SuccessResponse<>(data, status);
     }
 }
