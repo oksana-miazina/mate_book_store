@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public class SuccessResponse<T> extends GeneralResponse {
-    private T data;
+    private final T data;
 
     public SuccessResponse(T data, HttpStatus status) {
         super(status);
