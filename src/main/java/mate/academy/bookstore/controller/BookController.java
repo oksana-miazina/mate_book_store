@@ -8,6 +8,7 @@ import mate.academy.bookstore.dto.BookRequestDto;
 import mate.academy.bookstore.response.ResponseHandler;
 import mate.academy.bookstore.response.SuccessResponse;
 import mate.academy.bookstore.service.BookService;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,9 +28,9 @@ public class BookController {
     private final BookService bookService;
 
     @GetMapping
-    public ResponseEntity<SuccessResponse<List<BookDto>>> getAll() {
+    public ResponseEntity<SuccessResponse<List<BookDto>>> getAll(Pageable pageable) {
         return ResponseHandler.getSuccessResponse(
-                bookService.findAll());
+                bookService.findAll(pageable));
     }
 
     @GetMapping("/{id}")
