@@ -1,5 +1,6 @@
 package mate.academy.bookstore.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -14,5 +15,10 @@ public class ErrorResponse extends GeneralResponse {
     public ErrorResponse(List<Message> errors, HttpStatus status) {
         super(status);
         this.errors = errors;
+    }
+
+    @Schema(example = "false")
+    public boolean getSuccess() {
+        return isSuccess();
     }
 }
