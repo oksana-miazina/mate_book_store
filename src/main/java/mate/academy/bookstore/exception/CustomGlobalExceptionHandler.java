@@ -46,6 +46,7 @@ public class CustomGlobalExceptionHandler {
     }
 
     @ExceptionHandler({
+            RegistrationException.class,
             DataIntegrityViolationException.class,
             EntityAlreadyExistsException.class
     })
