@@ -6,13 +6,13 @@ import java.util.Optional;
 import lombok.AllArgsConstructor;
 import mate.academy.bookstore.dto.BookDto;
 import mate.academy.bookstore.dto.BookRequestDto;
+import mate.academy.bookstore.exception.EntityAlreadyExistsException;
 import mate.academy.bookstore.exception.EntityNotFoundException;
 import mate.academy.bookstore.mapper.BookMapper;
 import mate.academy.bookstore.model.Book;
 import mate.academy.bookstore.repository.BookRepository;
 import mate.academy.bookstore.service.BookService;
 import mate.academy.bookstore.service.LocaleService;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +27,7 @@ public class BookServiceImpl implements BookService {
     public BookDto save(BookRequestDto bookDto) {
         bookRepository.findByIsbn(bookDto.getIsbn())
                 .ifPresent(s -> {
-                    throw new DataIntegrityViolationException(
+                    throw new EntityAlreadyExistsException(
                             localeService.getMessage("exception.exists.book")
                     );
                 });
@@ -56,7 +56,7 @@ public class BookServiceImpl implements BookService {
         if (!book.getIsbn().equals(bookDto.getIsbn())) {
             Optional<Book> bookByIsbn = bookRepository.findByIsbn(bookDto.getIsbn());
             if (bookByIsbn.isPresent() && !Objects.equals(bookByIsbn.get().getId(), book.getId())) {
-                throw new DataIntegrityViolationException(
+                throw new EntityAlreadyExistsException(
                         localeService.getMessage("exception.exists.book")
                 );
             }

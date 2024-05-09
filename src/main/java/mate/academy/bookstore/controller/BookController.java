@@ -36,9 +36,6 @@ public class BookController {
 
     @GetMapping
     @Operation(summary = "Get all books", description = "Get all books")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", useReturnTypeSchema = true)
-    })
     public SuccessResponse<List<BookDto>> getAll(Pageable pageable) {
         return ResponseHandler.getSuccessResponse(
                 bookService.findAll(pageable));

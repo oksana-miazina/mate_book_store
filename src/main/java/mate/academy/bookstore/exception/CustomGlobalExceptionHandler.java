@@ -4,6 +4,7 @@ import java.util.List;
 import mate.academy.bookstore.response.ErrorResponse;
 import mate.academy.bookstore.response.ResponseHandler;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
@@ -16,7 +17,7 @@ public class CustomGlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ErrorResponse handleException(Exception ex) {
         return ResponseHandler.getErrorResponse(
-                ex.getMessage(), HttpStatus.BAD_REQUEST);
+                ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
@@ -37,9 +38,19 @@ public class CustomGlobalExceptionHandler {
                 errors, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(DataIntegrityViolationException.class)
+    @ExceptionHandler(PropertyReferenceException.class)
+    public ErrorResponse handlePropertyReferenceException(
+            PropertyReferenceException ex) {
+        return ResponseHandler.getErrorResponse(
+                ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({
+            DataIntegrityViolationException.class,
+            EntityAlreadyExistsException.class
+    })
     public ErrorResponse handleDataIntegrityViolationException(
-            DataIntegrityViolationException ex) {
+            Exception ex) {
         return ResponseHandler.getErrorResponse(
                 ex.getMessage(), HttpStatus.CONFLICT);
     }
