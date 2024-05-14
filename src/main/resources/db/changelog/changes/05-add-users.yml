@@ -1,0 +1,47 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-users
+      author: omiazina
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: email
+                  value: john.doe@example.com
+              - column:
+                  name: password
+                  value: $2a$10$HGbgVTvrGt8uqKxSGBc1dOjQyGLI84q40j7fJYmNTxy7YfETv4Lni
+              - column:
+                  name: first_name
+                  value: Jogn
+              - column:
+                  name: last_name
+                  value: Doe
+              - column:
+                  name: shipping_address
+                  value: Kyiv
+              - column:
+                  name: is_deleted
+                  valueBoolean: false
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: email
+                  value: john1.doe@example.com
+              - column:
+                  name: password
+                  value: $2a$10$HGbgVTvrGt8uqKxSGBc1dOjQyGLI84q40j7fJYmNTxy7YfETv4Lni
+              - column:
+                  name: first_name
+                  value: Jogn1
+              - column:
+                  name: last_name
+                  value: Doe
+              - column:
+                  name: shipping_address
+                  value: Kyiv
+              - column:
+                  name: is_deleted
+                  valueBoolean: false
