@@ -15,9 +15,11 @@ import mate.academy.bookstore.response.ErrorResponse;
 import mate.academy.bookstore.response.ResponseHandler;
 import mate.academy.bookstore.response.SuccessResponse;
 import mate.academy.bookstore.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Authentication", description = "Endpoints for authentication")
@@ -28,9 +30,10 @@ public class AuthenticationController {
     private UserService userService;
 
     @PostMapping("/registration")
+    @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "User Registration")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "201", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "400", content =
                     { @Content(schema = @Schema(implementation = ErrorResponse.class)) }),
             @ApiResponse(responseCode = "409",
@@ -41,6 +44,7 @@ public class AuthenticationController {
             @Valid @RequestBody UserRegistrationRequestDto requestDto)
             throws RegistrationException {
         return ResponseHandler.getSuccessResponse(
-                userService.register(requestDto));
+                userService.register(requestDto),
+                HttpStatus.CREATED);
     }
 }

@@ -1,0 +1,23 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-roles
+      author: omiazina
+      changes:
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: name
+                  value: USER
+              - column:
+                  name: is_deleted
+                  valueBoolean: false
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: name
+                  value: ADMIN
+              - column:
+                  name: is_deleted
+                  valueBoolean: false
