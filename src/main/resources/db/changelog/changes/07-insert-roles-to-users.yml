@@ -8,16 +8,16 @@ databaseChangeLog:
             columns:
               - column:
                   name: user_id
-                  value: 1
+                  valueComputed: (SELECT id FROM users WHERE email = 'john.doe@example.com')
               - column:
                   name: role_id
-                  value: 1
+                  valueComputed: (SELECT id FROM roles WHERE name = 'USER')
         - insert:
             tableName: users_roles
             columns:
               - column:
                   name: user_id
-                  value: 2
+                  valueComputed: (SELECT id FROM users WHERE email = 'john1.doe@example.com')
               - column:
                   name: role_id
-                  value: 2
+                  valueComputed: (SELECT id FROM roles WHERE name = 'ADMIN')

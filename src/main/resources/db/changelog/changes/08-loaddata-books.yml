@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: loaddata-books
+      author: omiazina
+      changes:
+        - loadData:
+            tableName: books
+            file: classpath:data/books.csv
+            separator: ','
+            encoding: UTF-8
