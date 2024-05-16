@@ -1,6 +1,8 @@
 package mate.academy.bookstore.service.impl;
 
-import lombok.AllArgsConstructor;
+import jakarta.annotation.PostConstruct;
+import java.util.Set;
+import lombok.RequiredArgsConstructor;
 import mate.academy.bookstore.dto.UserRegistrationRequestDto;
 import mate.academy.bookstore.dto.UserResponseDto;
 import mate.academy.bookstore.exception.RegistrationException;
@@ -15,13 +17,20 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final UserMapper userMapper;
     private final LocaleService localeService;
     private final PasswordEncoder encoder;
+
+    private long userRoleId;
+
+    @PostConstruct
+    void init() {
+        userRoleId = roleRepository.getByName(Role.RoleName.USER).getId();
+    }
 
     @Override
     public UserResponseDto register(UserRegistrationRequestDto requestDto)
@@ -31,7 +40,7 @@ public class UserServiceImpl implements UserService {
         }
         User user = userMapper.toModel(requestDto);
         user.setPassword(encoder.encode(user.getPassword()));
-        user.getRoles().add(roleRepository.getByName(Role.RoleName.USER));
+        user.setRoles(Set.of(roleRepository.getReferenceById(userRoleId)));
         User savedUser = userRepository.save(user);
         return userMapper.toUserResponseDto(savedUser);
     }

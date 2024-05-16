@@ -8,12 +8,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import mate.academy.bookstore.dto.UserLoginRequestDto;
+import mate.academy.bookstore.dto.UserLoginResponseDto;
 import mate.academy.bookstore.dto.UserRegistrationRequestDto;
 import mate.academy.bookstore.dto.UserResponseDto;
 import mate.academy.bookstore.exception.RegistrationException;
 import mate.academy.bookstore.response.ErrorResponse;
 import mate.academy.bookstore.response.ResponseHandler;
 import mate.academy.bookstore.response.SuccessResponse;
+import mate.academy.bookstore.security.AuthenticationService;
 import mate.academy.bookstore.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,7 +30,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 @AllArgsConstructor
 public class AuthenticationController {
-    private UserService userService;
+    private final UserService userService;
+    private final AuthenticationService authenticationService;
 
     @PostMapping("/registration")
     @ResponseStatus(HttpStatus.CREATED)
@@ -46,5 +50,13 @@ public class AuthenticationController {
         return ResponseHandler.getSuccessResponse(
                 userService.register(requestDto),
                 HttpStatus.CREATED);
+    }
+
+    @PostMapping("/login")
+    public SuccessResponse<UserLoginResponseDto> login(
+            @Valid @RequestBody UserLoginRequestDto requestDto) {
+        return ResponseHandler.getSuccessResponse(
+            authenticationService.authenticate(requestDto)
+        );
     }
 }
