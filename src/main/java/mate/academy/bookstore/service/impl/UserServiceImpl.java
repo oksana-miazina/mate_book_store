@@ -1,6 +1,5 @@
 package mate.academy.bookstore.service.impl;
 
-import jakarta.annotation.PostConstruct;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import mate.academy.bookstore.dto.UserRegistrationRequestDto;
@@ -25,13 +24,6 @@ public class UserServiceImpl implements UserService {
     private final LocaleService localeService;
     private final PasswordEncoder encoder;
 
-    private long userRoleId;
-
-    @PostConstruct
-    void init() {
-        userRoleId = roleRepository.getByName(Role.RoleName.USER).getId();
-    }
-
     @Override
     public UserResponseDto register(UserRegistrationRequestDto requestDto)
             throws RegistrationException {
@@ -40,7 +32,7 @@ public class UserServiceImpl implements UserService {
         }
         User user = userMapper.toModel(requestDto);
         user.setPassword(encoder.encode(user.getPassword()));
-        user.setRoles(Set.of(roleRepository.getReferenceById(userRoleId)));
+        user.setRoles(Set.of(roleRepository.getByName(Role.RoleName.USER)));
         User savedUser = userRepository.save(user);
         return userMapper.toUserResponseDto(savedUser);
     }
