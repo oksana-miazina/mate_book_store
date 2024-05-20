@@ -44,7 +44,8 @@ public class CategoryController {
     @Operation(summary = "Create a new category", description = "Create a new category")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", useReturnTypeSchema = true),
-            @ApiResponse(responseCode = "409", description = "Category with such name already exists",
+            @ApiResponse(responseCode = "409",
+                    description = "Category with such name already exists",
                     content = { @Content(schema = @Schema(implementation = ErrorResponse.class)) }),
     })
     public SuccessResponse<CategoryDto> createCategory(
@@ -103,7 +104,8 @@ public class CategoryController {
     }
 
     @GetMapping("/{id}/books")
-    @Operation(summary = "Get all books by category id", description = "Get all books in specific category")
+    @Operation(summary = "Get all books by category id",
+            description = "Get all books in specific category")
     public SuccessResponse<List<BookDtoWithoutCategoryIds>> getBooksByCategoryId(
             @PathVariable Long id, Pageable pageable) {
         return ResponseHandler.getSuccessResponse(
