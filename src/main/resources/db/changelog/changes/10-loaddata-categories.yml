@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: loaddata-categories
+      author: omiazina
+      changes:
+        - loadData:
+            tableName: categories
+            file: classpath:data/categories.csv
+            separator: ','
+            encoding: UTF-8
