@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import mate.academy.bookstore.dto.BookDto;
+import mate.academy.bookstore.dto.BookDtoWithoutCategoryIds;
 import mate.academy.bookstore.dto.BookRequestDto;
 import mate.academy.bookstore.exception.EntityAlreadyExistsException;
 import mate.academy.bookstore.exception.EntityNotFoundException;
@@ -47,6 +48,13 @@ public class BookServiceImpl implements BookService {
     public BookDto getById(Long id) {
         Book book = getBookByIdOrThrowException(id);
         return bookMapper.toDto(book);
+    }
+
+    @Override
+    public List<BookDtoWithoutCategoryIds> getBooksByCategoryId(Long id, Pageable pageable) {
+        return bookRepository.findAllByCategoryId(id, pageable).stream()
+                .map(bookMapper::toDtoWithoutCategories)
+                .toList();
     }
 
     @Override

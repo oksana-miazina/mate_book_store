@@ -15,3 +15,11 @@ databaseChangeLog:
       file: /db/changelog/changes/07-insert-roles-to-users.yml
   - include:
       file: /db/changelog/changes/08-loaddata-books.yml
+  - include:
+      file: /db/changelog/changes/09-create-categories-table.yml
+  - include:
+      file: /db/changelog/changes/10-loaddata-categories.yml
+  - include:
+      file: /db/changelog/changes/11-create-books-categories-table.yml
+  - include:
+      file: /db/changelog/changes/12-loaddata-books-categories.yml

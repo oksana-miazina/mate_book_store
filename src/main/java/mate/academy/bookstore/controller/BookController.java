@@ -36,7 +36,6 @@ public class BookController {
     private final BookService bookService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @Operation(summary = "Get all books", description = "Get all books")
     public SuccessResponse<List<BookDto>> getAll(Pageable pageable) {
         return ResponseHandler.getSuccessResponse(
@@ -44,7 +43,6 @@ public class BookController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @Operation(summary = "Get book by id", description = "Get book by id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", useReturnTypeSchema = true),
