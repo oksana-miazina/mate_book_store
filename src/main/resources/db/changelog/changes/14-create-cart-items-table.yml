@@ -1,0 +1,27 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-cart-items-table
+      author: omiazina
+      changes:
+        - createTable:
+            tableName: cart_items
+            columns:
+              - column:
+                  name: quantity
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: book_id
+                  type: bigint
+                  constraints:
+                    primaryKey: true
+                    foreignKeyName: fk_cart_items_book_id
+                    references: books(id)
+              - column:
+                  name: shopping_cart_id
+                  type: bigint
+                  constraints:
+                    primaryKey: true
+                    foreignKeyName: fk_cart_items_shopping_cart_id
+                    references: shopping_carts(user_id)

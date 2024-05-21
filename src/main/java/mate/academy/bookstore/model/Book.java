@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import java.util.Set;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.SQLDelete;
@@ -26,6 +27,7 @@ import org.hibernate.annotations.SQLRestriction;
 @Setter
 @EqualsAndHashCode
 @ToString
+@NoArgsConstructor
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -55,4 +57,8 @@ public class Book {
 
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
+
+    public Book(Long id) {
+        this.id = id;
+    }
 }
