@@ -1,8 +1,5 @@
 package mate.academy.bookstore.mapper;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import mate.academy.bookstore.config.MapperConfig;
 import mate.academy.bookstore.dto.BookDto;
 import mate.academy.bookstore.dto.BookDtoWithoutCategoryIds;
@@ -23,8 +20,7 @@ public interface BookMapper {
     BookDto toDto(Book book);
 
     @Mappings({
-            @Mapping(source = "categories", target = "categories",
-                    qualifiedByName = "categoriesToSet"),
+            @Mapping(source = "categories", target = "categories"),
             @Mapping(target = "id", ignore = true),
             @Mapping(target = "deleted", ignore = true)
     })
@@ -35,10 +31,5 @@ public interface BookMapper {
     @Named("categoryToId")
     default Long categoryToId(Category category) {
         return category.getId();
-    }
-
-    @Named("categoriesToSet")
-    default Set<Category> map(List<Category> categories) {
-        return new HashSet<>(categories);
     }
 }

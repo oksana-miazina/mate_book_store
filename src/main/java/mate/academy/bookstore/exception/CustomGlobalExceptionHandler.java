@@ -10,16 +10,19 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class CustomGlobalExceptionHandler {
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     public ErrorResponse handleException(Exception ex) {
         return ResponseHandler.getErrorResponse(
                 ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(EntityNotFoundException.class)
     public ErrorResponse handleEntityNotFoundException(
             EntityNotFoundException ex) {
@@ -27,6 +30,7 @@ public class CustomGlobalExceptionHandler {
                 ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ErrorResponse handleValidationExceptions(
             MethodArgumentNotValidException ex) {
@@ -38,6 +42,7 @@ public class CustomGlobalExceptionHandler {
                 errors, HttpStatus.BAD_REQUEST);
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(PropertyReferenceException.class)
     public ErrorResponse handlePropertyReferenceException(
             PropertyReferenceException ex) {
@@ -45,6 +50,7 @@ public class CustomGlobalExceptionHandler {
                 ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
+    @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler({
             RegistrationException.class,
             DataIntegrityViolationException.class,

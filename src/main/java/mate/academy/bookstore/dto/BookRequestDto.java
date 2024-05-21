@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.Set;
 import lombok.Data;
 import mate.academy.bookstore.model.Category;
 
@@ -35,5 +35,5 @@ public class BookRequestDto {
     private String description;
     private String coverImage;
     @NotEmpty
-    private List<Category> categories;
+    private Set<Category> categories;
 }
