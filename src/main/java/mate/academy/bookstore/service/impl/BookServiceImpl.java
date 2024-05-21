@@ -3,6 +3,7 @@ package mate.academy.bookstore.service.impl;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import mate.academy.bookstore.dto.BookDto;
 import mate.academy.bookstore.dto.BookDtoWithoutCategoryIds;
@@ -11,7 +12,9 @@ import mate.academy.bookstore.exception.EntityAlreadyExistsException;
 import mate.academy.bookstore.exception.EntityNotFoundException;
 import mate.academy.bookstore.mapper.BookMapper;
 import mate.academy.bookstore.model.Book;
+import mate.academy.bookstore.model.Category;
 import mate.academy.bookstore.repository.BookRepository;
+import mate.academy.bookstore.repository.CategoryRepository;
 import mate.academy.bookstore.service.BookService;
 import mate.academy.bookstore.service.LocaleService;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +24,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
+    private final CategoryRepository categoryRepository;
     private final BookMapper bookMapper;
     private final LocaleService localeService;
 
@@ -32,7 +36,9 @@ public class BookServiceImpl implements BookService {
                             localeService.getMessage("exception.exists.book")
                     );
                 });
+
         Book book = bookMapper.toModel(bookDto);
+        validateBookCategoriesExistence(book.getCategories());
         Book savedBook = bookRepository.save(book);
         return bookMapper.toDto(savedBook);
     }
@@ -71,6 +77,7 @@ public class BookServiceImpl implements BookService {
         }
 
         Book bookUpdated = bookMapper.toModel(bookDto);
+        validateBookCategoriesExistence(bookUpdated.getCategories());
         bookUpdated.setId(id);
         return bookMapper.toDto(bookRepository.save(bookUpdated));
     }
@@ -86,5 +93,17 @@ public class BookServiceImpl implements BookService {
                 .orElseThrow(() -> new EntityNotFoundException(
                         localeService.getMessage("exception.notfound.book") + id
                 ));
+    }
+
+    private void validateBookCategoriesExistence(Set<Category> categories) {
+        categories.forEach(i -> {
+            Long categoryId = i.getId();
+            boolean isCategoryExists = categoryRepository.existsById(categoryId);
+            if (!isCategoryExists) {
+                throw new EntityNotFoundException(
+                        localeService.getMessage("exception.notfound.category") + categoryId
+                );
+            }
+        });
     }
 }
