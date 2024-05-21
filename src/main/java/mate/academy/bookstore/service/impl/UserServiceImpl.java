@@ -7,8 +7,10 @@ import mate.academy.bookstore.dto.UserResponseDto;
 import mate.academy.bookstore.exception.RegistrationException;
 import mate.academy.bookstore.mapper.UserMapper;
 import mate.academy.bookstore.model.Role;
+import mate.academy.bookstore.model.ShoppingCart;
 import mate.academy.bookstore.model.User;
 import mate.academy.bookstore.repository.RoleRepository;
+import mate.academy.bookstore.repository.ShoppingCartRepository;
 import mate.academy.bookstore.repository.UserRepository;
 import mate.academy.bookstore.service.LocaleService;
 import mate.academy.bookstore.service.UserService;
@@ -23,6 +25,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final LocaleService localeService;
     private final PasswordEncoder encoder;
+    private final ShoppingCartRepository shoppingCartRepository;
 
     @Override
     public UserResponseDto register(UserRegistrationRequestDto requestDto)
@@ -34,6 +37,12 @@ public class UserServiceImpl implements UserService {
         user.setPassword(encoder.encode(user.getPassword()));
         user.setRoles(Set.of(roleRepository.getByName(Role.RoleName.USER)));
         User savedUser = userRepository.save(user);
+
+        ShoppingCart shoppingCart = new ShoppingCart();
+        shoppingCart.setUser(savedUser);
+        shoppingCart.setId(savedUser.getId());
+        shoppingCartRepository.save(shoppingCart);
+
         return userMapper.toUserResponseDto(savedUser);
     }
 }
