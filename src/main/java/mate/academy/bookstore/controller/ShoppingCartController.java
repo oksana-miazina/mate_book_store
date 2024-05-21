@@ -35,7 +35,7 @@ public class ShoppingCartController {
     private final ShoppingCartService shoppingCartService;
 
     @GetMapping
-    public SuccessResponse<ShoppingCartDto> get(@AuthenticationPrincipal User user) {
+    public SuccessResponse<ShoppingCartDto> getShoppingCart(@AuthenticationPrincipal User user) {
         return ResponseHandler.getSuccessResponse(
                 shoppingCartService.getByUserId(user.getId()));
     }
@@ -43,7 +43,7 @@ public class ShoppingCartController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a new shopping cart", description = "Create a new shopping cart")
-    public SuccessResponse<ShoppingCartDto> createShoppingCart(
+    public SuccessResponse<ShoppingCartDto> updateShoppingCart(
             @Valid @RequestBody ShoppingCartRequestDto dto, @AuthenticationPrincipal User user) {
         return ResponseHandler.getSuccessResponse(
                 shoppingCartService.save(dto, user),
@@ -51,7 +51,7 @@ public class ShoppingCartController {
         );
     }
 
-    @DeleteMapping("/cart-items/{cartId}/{bookId}")
+    @DeleteMapping("/cart-items/{bookId}")
     @Operation(summary = "Delete item from shopping cart",
             description = "Delete item from shopping cart")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -60,8 +60,9 @@ public class ShoppingCartController {
             @ApiResponse(responseCode = "404", content =
                     { @Content(schema = @Schema(implementation = ErrorResponse.class)) }),
     })
-    public void deleteBookById(@PathVariable Long cartId, @PathVariable Long bookId) {
-        ShoppingCart shoppingCart = new ShoppingCart(cartId);
+    public void deleteBookFromCartById(@PathVariable Long bookId,
+                                       @AuthenticationPrincipal User user) {
+        ShoppingCart shoppingCart = new ShoppingCart(user.getId());
         Book book = new Book(bookId);
 
         CartItemKey id = new CartItemKey(shoppingCart, book);
