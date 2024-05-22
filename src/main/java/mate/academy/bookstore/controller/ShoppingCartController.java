@@ -9,9 +9,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mate.academy.bookstore.dto.ShoppingCartDto;
 import mate.academy.bookstore.dto.ShoppingCartRequestDto;
-import mate.academy.bookstore.model.Book;
-import mate.academy.bookstore.model.CartItemKey;
-import mate.academy.bookstore.model.ShoppingCart;
 import mate.academy.bookstore.model.User;
 import mate.academy.bookstore.response.ErrorResponse;
 import mate.academy.bookstore.response.ResponseHandler;
@@ -35,6 +32,7 @@ public class ShoppingCartController {
     private final ShoppingCartService shoppingCartService;
 
     @GetMapping
+    @Operation(summary = "Get user's shopping cart", description = "Get user's shopping cart")
     public SuccessResponse<ShoppingCartDto> getShoppingCart(@AuthenticationPrincipal User user) {
         return ResponseHandler.getSuccessResponse(
                 shoppingCartService.getByUserId(user.getId()));
@@ -62,10 +60,6 @@ public class ShoppingCartController {
     })
     public void deleteBookFromCartById(@PathVariable Long bookId,
                                        @AuthenticationPrincipal User user) {
-        ShoppingCart shoppingCart = new ShoppingCart(user.getId());
-        Book book = new Book(bookId);
-
-        CartItemKey id = new CartItemKey(shoppingCart, book);
-        shoppingCartService.deleteCartItemById(id);
+        shoppingCartService.deleteCartItem(bookId, user.getId());
     }
 }
