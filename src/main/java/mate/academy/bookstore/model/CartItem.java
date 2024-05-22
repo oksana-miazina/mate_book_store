@@ -20,5 +20,6 @@ public class CartItem {
     private CartItemKey id;
 
     @Column(nullable = false)
+    @EqualsAndHashCode.Exclude
     private int quantity;
 }

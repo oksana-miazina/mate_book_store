@@ -1,36 +1,34 @@
 package mate.academy.bookstore.service.impl;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import mate.academy.bookstore.dto.CartItemRequestDto;
 import mate.academy.bookstore.dto.ShoppingCartDto;
 import mate.academy.bookstore.dto.ShoppingCartRequestDto;
 import mate.academy.bookstore.exception.EntityNotFoundException;
 import mate.academy.bookstore.mapper.ShoppingCartMapper;
 import mate.academy.bookstore.model.Book;
+import mate.academy.bookstore.model.CartItem;
 import mate.academy.bookstore.model.CartItemKey;
 import mate.academy.bookstore.model.ShoppingCart;
 import mate.academy.bookstore.model.User;
-import mate.academy.bookstore.repository.BookRepository;
 import mate.academy.bookstore.repository.CartItemRepository;
 import mate.academy.bookstore.repository.ShoppingCartRepository;
+import mate.academy.bookstore.service.BookService;
 import mate.academy.bookstore.service.LocaleService;
 import mate.academy.bookstore.service.ShoppingCartService;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class ShoppingCartServiceImpl implements ShoppingCartService {
     private final ShoppingCartRepository shoppingCartRepository;
     private final CartItemRepository cartItemRepository;
-    private final BookRepository bookRepository;
     private final ShoppingCartMapper shoppingCartMapper;
     private final LocaleService localeService;
-
-    @PersistenceContext
-    private EntityManager entityManager;
+    private final BookService bookService;
 
     @Override
     public void createFor(User user) {
@@ -41,8 +39,12 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     }
 
     @Override
-    @Transactional
     public ShoppingCartDto save(ShoppingCartRequestDto dto, User user) {
+        List<Long> newBookIds = dto.getCartItems().stream()
+                .map(CartItemRequestDto::getBookId)
+                .toList();
+        bookService.validateBooksExistence(newBookIds);
+
         ShoppingCart shoppingCart = shoppingCartMapper.toModel(dto);
         shoppingCart.setUser(user);
         shoppingCart.setId(user.getId());
@@ -52,8 +54,10 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
                 .collect(Collectors.toSet())
         );
 
-        ShoppingCart savedShoppingCart = shoppingCartRepository.saveAndFlush(shoppingCart);
-        entityManager.refresh(savedShoppingCart);
+        ShoppingCart savedShoppingCart = shoppingCartRepository.save(shoppingCart);
+        Set<CartItem> savedCartItems = cartItemRepository.getById_Book_IdIn(newBookIds);
+        savedShoppingCart.setCartItems(savedCartItems);
+
         return shoppingCartMapper.toDto(savedShoppingCart);
     }
 
