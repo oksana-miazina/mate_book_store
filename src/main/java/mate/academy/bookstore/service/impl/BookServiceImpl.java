@@ -90,6 +90,21 @@ public class BookServiceImpl implements BookService {
         bookRepository.deleteById(id);
     }
 
+    public void validateBooksExistence(List<Long> booksIds) {
+        Set<Long> existingBooks = bookRepository.findByIdIn(booksIds)
+                .stream()
+                .map(Book::getId)
+                .collect(Collectors.toSet());
+
+        if (existingBooks.size() != booksIds.size()) {
+            Set<Long> notFoundBooks = new HashSet<>(booksIds);
+            notFoundBooks.removeAll(existingBooks);
+            throw new EntityNotFoundException(
+                    localeService.getMessage("exception.notfound.books") + notFoundBooks
+            );
+        }
+    }
+
     private Book getBookByIdOrThrowException(Long id) {
         return bookRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(

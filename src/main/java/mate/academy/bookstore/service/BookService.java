@@ -18,4 +18,6 @@ public interface BookService {
     BookDto updateById(Long id, BookRequestDto bookRequestDto);
 
     void deleteById(Long id);
+
+    void validateBooksExistence(List<Long> booksIds);
 }
