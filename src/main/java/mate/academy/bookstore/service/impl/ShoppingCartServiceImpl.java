@@ -1,13 +1,14 @@
 package mate.academy.bookstore.service.impl;
 
-import java.util.Set;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import mate.academy.bookstore.dto.ShoppingCartDto;
 import mate.academy.bookstore.dto.ShoppingCartRequestDto;
 import mate.academy.bookstore.exception.EntityNotFoundException;
 import mate.academy.bookstore.mapper.ShoppingCartMapper;
-import mate.academy.bookstore.model.CartItem;
+import mate.academy.bookstore.model.Book;
 import mate.academy.bookstore.model.CartItemKey;
 import mate.academy.bookstore.model.ShoppingCart;
 import mate.academy.bookstore.model.User;
@@ -17,6 +18,7 @@ import mate.academy.bookstore.repository.ShoppingCartRepository;
 import mate.academy.bookstore.service.LocaleService;
 import mate.academy.bookstore.service.ShoppingCartService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,20 +29,31 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     private final ShoppingCartMapper shoppingCartMapper;
     private final LocaleService localeService;
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     @Override
+    public void createFor(User user) {
+        ShoppingCart shoppingCart = new ShoppingCart();
+        shoppingCart.setUser(user);
+        shoppingCart.setId(user.getId());
+        shoppingCartRepository.save(shoppingCart);
+    }
+
+    @Override
+    @Transactional
     public ShoppingCartDto save(ShoppingCartRequestDto dto, User user) {
         ShoppingCart shoppingCart = shoppingCartMapper.toModel(dto);
         shoppingCart.setUser(user);
         shoppingCart.setId(user.getId());
-
-        validateCartBooksExistence(shoppingCart.getCartItems());
 
         shoppingCart.setCartItems(shoppingCart.getCartItems().stream()
                 .peek(i -> i.getId().setShoppingCart(shoppingCart))
                 .collect(Collectors.toSet())
         );
 
-        ShoppingCart savedShoppingCart = shoppingCartRepository.save(shoppingCart);
+        ShoppingCart savedShoppingCart = shoppingCartRepository.saveAndFlush(shoppingCart);
+        entityManager.refresh(savedShoppingCart);
         return shoppingCartMapper.toDto(savedShoppingCart);
     }
 
@@ -51,23 +64,16 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     }
 
     @Override
-    public void deleteCartItemById(CartItemKey id) {
-        cartItemRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        localeService.getMessage("exception.notfound.cartitem") + id
-                ));
-        cartItemRepository.deleteById(id);
-    }
+    public void deleteCartItem(Long bookId, Long userId) {
+        ShoppingCart shoppingCart = new ShoppingCart(userId);
+        Book book = new Book(bookId);
+        CartItemKey id = new CartItemKey(shoppingCart, book);
 
-    private void validateCartBooksExistence(Set<CartItem> cartItems) {
-        cartItems.forEach(i -> {
-            Long bookId = i.getId().getBook().getId();
-            boolean isBookExists = bookRepository.existsById(bookId);
-            if (!isBookExists) {
-                throw new EntityNotFoundException(
-                        localeService.getMessage("exception.notfound.book") + bookId
-                );
-            }
-        });
+        if (!cartItemRepository.existsById(id)) {
+            throw new EntityNotFoundException(
+                    localeService.getMessage("exception.notfound.cartitem") + bookId
+            );
+        }
+        cartItemRepository.deleteById(id);
     }
 }
