@@ -2,7 +2,6 @@ package mate.academy.bookstore.service.impl;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import mate.academy.bookstore.dto.CategoryDto;
 import mate.academy.bookstore.dto.CategoryRequestDto;
@@ -32,18 +31,15 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto getById(Long id) {
-        Category category = getCategoryByIdOrThrowException(id);
+        Category category = getModelById(id);
         return categoryMapper.toDto(category);
     }
 
     @Override
     public CategoryDto save(CategoryRequestDto categoryDto) {
-        categoryRepository.findByName(categoryDto.getName())
-                .ifPresent(s -> {
-                    throw new EntityAlreadyExistsException(
-                            localeService.getMessage("exception.exists.category")
-                    );
-                });
+        if (categoryRepository.existsByName(categoryDto.getName())) {
+            throw getAlreadyExistsException();
+        }
         Category category = categoryMapper.toModel(categoryDto);
         Category savedCategory = categoryRepository.save(category);
         return categoryMapper.toDto(savedCategory);
@@ -51,34 +47,43 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto update(Long id, CategoryRequestDto categoryDto) {
-        Category category = getCategoryByIdOrThrowException(id);
+        Category categoryFromDB = getModelById(id);
+        String newName = categoryDto.getName();
 
-        if (!category.getName().equals(categoryDto.getName())) {
-            Optional<Category> categoryByIsbn =
-                    categoryRepository.findByName(categoryDto.getName());
-            if (categoryByIsbn.isPresent()
-                    && !Objects.equals(categoryByIsbn.get().getId(), category.getId())) {
-                throw new EntityAlreadyExistsException(
-                        localeService.getMessage("exception.exists.category")
-                );
-            }
+        if (!Objects.equals(categoryFromDB.getName(), newName)
+                && categoryRepository.existsByName(newName)) {
+            throw getAlreadyExistsException();
         }
 
-        Category categoryUpdated = categoryMapper.toModel(categoryDto);
-        categoryUpdated.setId(id);
-        return categoryMapper.toDto(categoryRepository.save(categoryUpdated));
+        Category category = categoryMapper.toModel(categoryDto);
+        category.setId(id);
+        return categoryMapper.toDto(
+                categoryRepository.save(category)
+        );
     }
 
     @Override
     public void deleteById(Long id) {
-        getCategoryByIdOrThrowException(id);
+        if (!categoryRepository.existsById(id)) {
+            throw getNotFoundException(id);
+        }
         categoryRepository.deleteById(id);
     }
 
-    private Category getCategoryByIdOrThrowException(Long id) {
+    private Category getModelById(Long id) {
         return categoryRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        localeService.getMessage("exception.notfound.category") + id
-                ));
+                .orElseThrow(() -> getNotFoundException(id));
+    }
+
+    private EntityAlreadyExistsException getAlreadyExistsException() {
+        return new EntityAlreadyExistsException(
+                localeService.getMessage("exception.exists.category")
+        );
+    }
+
+    private EntityNotFoundException getNotFoundException(Long id) {
+        return new EntityNotFoundException(
+                localeService.getMessage("exception.notfound.category") + id
+        );
     }
 }

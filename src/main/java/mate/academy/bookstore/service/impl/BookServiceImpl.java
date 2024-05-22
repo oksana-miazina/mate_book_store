@@ -1,9 +1,11 @@
 package mate.academy.bookstore.service.impl;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import mate.academy.bookstore.dto.BookDto;
 import mate.academy.bookstore.dto.BookDtoWithoutCategoryIds;
@@ -96,14 +98,20 @@ public class BookServiceImpl implements BookService {
     }
 
     private void validateBookCategoriesExistence(Set<Category> categories) {
-        categories.forEach(i -> {
-            Long categoryId = i.getId();
-            boolean isCategoryExists = categoryRepository.existsById(categoryId);
-            if (!isCategoryExists) {
-                throw new EntityNotFoundException(
-                        localeService.getMessage("exception.notfound.category") + categoryId
-                );
-            }
-        });
+        List<Long> categoriesIds = categories.stream()
+                .map(Category::getId)
+                .toList();
+        Set<Long> existingCategories = categoryRepository.findByIdIn(categoriesIds)
+                .stream()
+                .map(Category::getId)
+                .collect(Collectors.toSet());
+
+        if (existingCategories.size() != categories.size()) {
+            Set<Long> notFoundCategories = new HashSet<>(categoriesIds);
+            notFoundCategories.removeAll(existingCategories);
+            throw new EntityNotFoundException(
+                    localeService.getMessage("exception.notfound.categories") + notFoundCategories
+            );
+        }
     }
 }
