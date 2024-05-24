@@ -38,7 +38,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderDto getOrderById(Long orderId, User user) {
-        Order order = orderRepository.findByIdAndUser_Id(orderId, user.getId())
+        Order order = orderRepository.findByIdAndUserId(orderId, user.getId())
                 .orElseThrow(() -> new EntityNotFoundException(
                         localeService.getMessage("exception.notfound.order") + orderId
                 ));
@@ -48,7 +48,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderItemDto getOrderItemById(Long itemId, Long orderId, User user) {
         OrderItem orderItem = orderItemRepository
-                .findByIdAndOrder_IdAndOrder_User_Id(itemId, orderId, user.getId())
+                .findByIdAndOrderIdAndOrderUserId(itemId, orderId, user.getId())
                 .orElseThrow(() -> new EntityNotFoundException(
                         localeService.getMessage("exception.notfound.orderitem") + itemId
                 ));
@@ -58,7 +58,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderItemDto> getOrderItemsByOrderId(Long orderId, User user) {
         List<OrderItem> orderItems = orderItemRepository
-                .findByOrder_IdAndOrder_User_Id(orderId, user.getId());
+                .findByOrderIdAndOrderUserId(orderId, user.getId());
         if (orderItems.isEmpty()) {
             throw new EntityNotFoundException(
                     localeService.getMessage("exception.notfound.orderitems") + orderId
@@ -71,7 +71,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderDto> findAll(User user) {
-        return orderRepository.findByUser_Id(user.getId()).stream()
+        return orderRepository.findByUserId(user.getId()).stream()
                 .map(orderMapper::toDto)
                 .toList();
     }
@@ -79,20 +79,10 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderDto create(OrderCreateRequestDto dto, User user) {
-        Order order = new Order();
-        order.setShippingAddress(dto.getShippingAddress());
-        order.setOrderDate(LocalDateTime.now());
-        order.setUser(user);
-        order.setStatus(Order.Status.NEW);
-
+        Order order = createOrder(dto, user);
         pickUpItemsIntoOrder(order);
+        order.setTotal(calculateTotal(order));
 
-        order.setTotal(order.getOrderItems().stream()
-                .map(b -> b.getPrice().multiply(BigDecimal.valueOf(b.getQuantity())))
-                .reduce(BigDecimal::add)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        localeService.getMessage("exception.order.total")
-                )));
         Order savedOrder = orderRepository.save(order);
         return orderMapper.toDto(savedOrder);
     }
@@ -130,5 +120,26 @@ public class OrderServiceImpl implements OrderService {
         orderItem.setQuantity(cartItem.getQuantity());
         orderItem.setPrice(book.getPrice());
         return orderItem;
+    }
+
+    private Order createOrder(OrderCreateRequestDto dto, User user) {
+        Order order = new Order();
+        order.setShippingAddress(dto.getShippingAddress());
+        order.setOrderDate(LocalDateTime.now());
+        order.setUser(user);
+        order.setStatus(Order.Status.NEW);
+        return order;
+    }
+
+    private BigDecimal calculateTotal(Order order) {
+        return order.getOrderItems().stream()
+                .map(orderItem -> {
+                    BigDecimal quantity = BigDecimal.valueOf(orderItem.getQuantity());
+                    return orderItem.getPrice().multiply(quantity);
+                })
+                .reduce(BigDecimal::add)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        localeService.getMessage("exception.order.total")
+                ));
     }
 }

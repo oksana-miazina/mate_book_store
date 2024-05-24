@@ -96,8 +96,7 @@ public class OrderController {
     public SuccessResponse<OrderDto> createOrder(@RequestBody @Valid OrderCreateRequestDto dto,
                                                  @AuthenticationPrincipal User user) {
         return ResponseHandler.getSuccessResponse(
-                orderService.create(dto, user),
-                HttpStatus.CREATED
+                orderService.create(dto, user)
         );
     }
 
