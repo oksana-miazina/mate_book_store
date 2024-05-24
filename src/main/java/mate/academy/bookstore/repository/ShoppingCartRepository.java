@@ -1,5 +1,6 @@
 package mate.academy.bookstore.repository;
 
+import java.util.Optional;
 import mate.academy.bookstore.model.ShoppingCart;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -9,5 +10,5 @@ public interface ShoppingCartRepository extends JpaRepository<ShoppingCart, Long
             + "LEFT JOIN FETCH sc.cartItems ci "
             + "JOIN FETCH ci.book "
             + "WHERE sc.user.id = :userId")
-    ShoppingCart getByUserId(Long userId);
+    Optional<ShoppingCart> getByUserId(Long userId);
 }
