@@ -31,7 +31,7 @@ public class ShoppingCart {
     private User user;
 
     @OneToMany(mappedBy = "shoppingCart", fetch = FetchType.LAZY,
-            cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+            cascade = {CascadeType.ALL})
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private Set<CartItem> cartItems;

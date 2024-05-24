@@ -61,7 +61,10 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     @Override
     public ShoppingCartDto getByUserId(Long id) {
-        ShoppingCart shoppingCart = shoppingCartRepository.getByUserId(id);
+        ShoppingCart shoppingCart = shoppingCartRepository.getByUserId(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        localeService.getMessage("exception.notfound.shoppingcart") + id
+                ));
         return shoppingCartMapper.toDto(shoppingCart);
     }
 
