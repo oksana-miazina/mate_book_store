@@ -112,7 +112,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private OrderItem createOrderItemFrom(CartItem cartItem, Order order) {
-        Book book = cartItem.getId().getBook();
+        Book book = cartItem.getBook();
 
         OrderItem orderItem = new OrderItem();
         orderItem.setOrder(order);
