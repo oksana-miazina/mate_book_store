@@ -30,7 +30,7 @@ public class ShoppingCart {
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
-    @OneToMany(mappedBy = "id.shoppingCart", fetch = FetchType.LAZY,
+    @OneToMany(mappedBy = "shoppingCart", fetch = FetchType.LAZY,
             cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @EqualsAndHashCode.Exclude
     @ToString.Exclude

@@ -1,7 +1,6 @@
 package mate.academy.bookstore.service.impl;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import mate.academy.bookstore.dto.CartItemRequestDto;
@@ -10,7 +9,6 @@ import mate.academy.bookstore.dto.ShoppingCartRequestDto;
 import mate.academy.bookstore.exception.EntityNotFoundException;
 import mate.academy.bookstore.mapper.ShoppingCartMapper;
 import mate.academy.bookstore.model.Book;
-import mate.academy.bookstore.model.CartItem;
 import mate.academy.bookstore.model.CartItemKey;
 import mate.academy.bookstore.model.ShoppingCart;
 import mate.academy.bookstore.model.User;
@@ -50,14 +48,14 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         shoppingCart.setId(user.getId());
 
         shoppingCart.setCartItems(shoppingCart.getCartItems().stream()
-                .peek(i -> i.getId().setShoppingCart(shoppingCart))
+                .peek(cartItem -> cartItem.setShoppingCart(shoppingCart))
+                .peek(cartItem -> cartItem.setId(
+                        new CartItemKey(shoppingCart.getId(), cartItem.getBook().getId())
+                ))
                 .collect(Collectors.toSet())
         );
 
         ShoppingCart savedShoppingCart = shoppingCartRepository.save(shoppingCart);
-        Set<CartItem> savedCartItems = cartItemRepository.getById_Book_IdIn(newBookIds);
-        savedShoppingCart.setCartItems(savedCartItems);
-
         return shoppingCartMapper.toDto(savedShoppingCart);
     }
 
@@ -71,7 +69,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     public void deleteCartItem(Long bookId, Long userId) {
         ShoppingCart shoppingCart = new ShoppingCart(userId);
         Book book = new Book(bookId);
-        CartItemKey id = new CartItemKey(shoppingCart, book);
+        CartItemKey id = new CartItemKey(shoppingCart.getId(), book.getId());
 
         if (!cartItemRepository.existsById(id)) {
             throw new EntityNotFoundException(
